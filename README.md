@@ -1,344 +1,429 @@
-# LeafDoc - Plant Disease Detection System
+# LeafDoc API Backend
 
-A full-stack web application for detecting plant diseases using deep learning, featuring a React frontend and FastAPI backend.
+FastAPI backend for LeafDoc plant disease detection application.
 
-## 🌟 Features
+## Features
 
-- 🔍 **AI-Powered Detection** - Classify 25+ plant diseases with confidence scores
-- 🎨 **Grad-CAM Visualization** - See which parts of the leaf influenced the diagnosis
-- 📊 **History Tracking** - View and manage all past detections
-- 💬 **Feedback System** - Correct predictions and improve the model
-- 🎯 **Care Recommendations** - Get actionable tips for each detected disease
-- 🌓 **Dark Mode** - Comfortable viewing in any lighting
-- 📱 **Responsive Design** - Works on desktop, tablet, and mobile
+- 🌱 Plant disease classification using PyTorch models
+- 📊 Grad-CAM visualization for model interpretability
+- 💾 SQLite/PostgreSQL database with Alembic migrations
+- 🔄 REST API with automatic OpenAPI documentation
+- 🐳 Docker support for easy deployment
+- ✅ Comprehensive test suite
 
-## 🏗️ Architecture
+## Tech Stack
+
+- **Framework**: FastAPI 0.104+
+- **Server**: Uvicorn with auto-reload
+- **ML**: PyTorch 2.1, TorchVision, OpenCV
+- **Database**: SQLAlchemy 2.0 with Alembic
+- **Validation**: Pydantic 2.5
+- **Testing**: Pytest with async support
+
+## Project Structure
 
 ```
-leafdoc-plant-aid/          # React + TypeScript frontend
-backend/                    # FastAPI + Python backend
+backend/
+├── app/
+│   ├── main.py              # FastAPI application
+│   ├── config.py            # Configuration with pydantic-settings
+│   ├── deps.py              # Dependency injection
+│   ├── db.py                # Database setup
+│   ├── models.py            # SQLAlchemy models
+│   ├── schemas.py           # Pydantic schemas
+│   ├── routers/             # API endpoints
+│   │   ├── predict.py       # POST /api/predict
+│   │   ├── history.py       # GET /api/history
+│   │   └── feedback.py      # POST /api/feedback
+│   ├── services/            # Business logic
+│   │   ├── inference.py     # Model inference
+│   │   ├── gradcam.py       # Visualization
+│   │   └── storage.py       # File management
+│   └── utils/
+│       └── tips.py          # Disease care tips
+├── migrations/              # Alembic migrations
+├── tests/                   # Test suite
+├── models/                  # PyTorch model files
+├── storage/                 # Uploaded images & heatmaps
+├── Dockerfile
+├── docker-compose.yml
+├── requirements.txt
+└── README.md
 ```
 
-### Frontend Stack
-
-- ⚛️ React 18 + TypeScript
-- 🎨 Tailwind CSS + shadcn/ui
-- 🔄 TanStack Query (React Query)
-- 🚀 Vite
-
-### Backend Stack
-
-- ⚡ FastAPI + Uvicorn
-- 🤖 PyTorch for ML inference
-- 💾 SQLAlchemy + Alembic
-- 🐘 SQLite/PostgreSQL
-
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 
 - Python 3.11+
-- Node.js 18+
-- npm or yarn
+- pip or poetry
 
-### Option 1: Automated Setup (Windows)
+### Installation
+
+1. **Clone and navigate to backend directory**:
 
 ```bash
-# Run the startup script
-start-all.bat
+cd backend
 ```
 
-This will:
-
-1. Set up backend (create venv, install dependencies)
-2. Set up frontend (npm install)
-3. Start both services
-4. Open the app in your browser
-
-### Option 2: Manual Setup
-
-#### Backend Setup
+2. **Create virtual environment**:
 
 ```bash
-# Navigate to backend
-cd backend
-
-# Create virtual environment
 python -m venv venv
-venv\Scripts\activate  # Windows
-source venv/bin/activate  # Linux/Mac
+# Windows
+venv\Scripts\activate
+# Linux/Mac
+source venv/bin/activate
+```
 
-# Install dependencies
+3. **Install dependencies**:
+
+```bash
 pip install -r requirements.txt
+```
 
-# Create .env file
-copy .env.example .env  # Windows
-cp .env.example .env    # Linux/Mac
+4. **Create .env file**:
 
-# Run migrations
+```bash
+cp .env.example .env
+```
+
+5. **Run database migrations**:
+
+```bash
 alembic upgrade head
+```
 
-# Start server
+6. **Start development server**:
+
+```bash
 uvicorn app.main:app --reload
 ```
 
-Backend runs on: **http://localhost:8000**
+The API will be available at:
 
-#### Frontend Setup
+- API: http://localhost:8000
+- Docs: http://localhost:8000/docs
+- ReDoc: http://localhost:8000/redoc
+
+### Using Makefile
 
 ```bash
-# Navigate to frontend
-cd leafdoc-plant-aid
+# Start development server
+make dev
 
-# Install dependencies
-npm install
+# Run tests
+make test
 
-# Create .env file
-copy .env.example .env  # Windows
-cp .env.example .env    # Linux/Mac
+# Format code
+make format
 
-# Start dev server
-npm run dev
+# Lint code
+make lint
+
+# Run migrations
+make migrate
 ```
 
-Frontend runs on: **http://localhost:5173**
+## Configuration
 
-### Verify Connection
+Configure the application via environment variables or `.env` file:
 
-```bash
-# Test backend connectivity
-python test_connection.py
+```env
+# Application
+APP_NAME=LeafDoc
+API_PREFIX=/api
+LOG_LEVEL=INFO
+
+# Model & Storage
+MODEL_PATH=models/leafdoc_mobilev3.ts  # TorchScript model
+STORAGE_DIR=storage
+
+# Database
+DATABASE_URL=sqlite:///./leafdoc.db
+# For PostgreSQL:
+# DATABASE_URL=postgresql://user:password@localhost:5432/leafdoc
+
+# CORS
+CORS_ORIGINS=*  # Or comma-separated: http://localhost:5173,http://localhost:3000
+
+# Server
+HOST=0.0.0.0
+PORT=8000
 ```
 
-## 📖 Documentation
+## API Endpoints
 
-- **[Integration Guide](INTEGRATION_GUIDE.md)** - Connecting frontend and backend
-- **[Backend README](backend/README.md)** - Backend setup and API docs
-- **[API Examples](backend/API_EXAMPLES.md)** - Code examples for all endpoints
-- **[Frontend README](leafdoc-plant-aid/README.md)** - Frontend setup and components
+### Health Check
 
-## 🔗 Access Points
+```http
+GET /health
+```
 
-Once running:
+Returns API health status and model load state.
 
-- **Frontend**: http://localhost:5173
-- **Backend API**: http://localhost:8000
-- **API Docs (Swagger)**: http://localhost:8000/docs
-- **API Docs (ReDoc)**: http://localhost:8000/redoc
-- **Health Check**: http://localhost:8000/health
+### Predict Disease
 
-## 🎯 Usage
+```http
+POST /api/predict
+Content-Type: multipart/form-data
 
-### 1. Detect Disease
+Parameters:
+- file: Image file (JPEG, PNG)
 
-1. Navigate to the **Detect** page
-2. Upload a photo of a plant leaf
-3. Click **Analyze Plant**
-4. View the diagnosis, confidence score, and care tips
-5. Toggle Grad-CAM visualization to see the model's focus areas
+Response:
+{
+  "id": "uuid",
+  "class": "disease_name",
+  "confidence": 0.95,
+  "tips": "Care recommendations...",
+  "image_url": "/static/images/uuid.jpg",
+  "heatmap_url": "/static/heatmaps/uuid.jpg",
+  "created_at": "2025-11-09T10:00:00"
+}
+```
 
-### 2. View History
+### Get History
 
-1. Navigate to the **History** page
-2. Browse all past detections
-3. Filter by disease type or feedback status
-4. Click on any item to view details
+```http
+GET /api/history?page=1&limit=20&label=apple&correct=true
 
-### 3. Submit Feedback
+Query Parameters:
+- page: Page number (default: 1)
+- limit: Items per page (default: 20, max: 100)
+- label: Filter by disease label
+- correct: Filter by feedback (true/false)
+- from: Filter from date (ISO format)
+- to: Filter to date (ISO format)
 
-1. Open any prediction from history
-2. Mark as "Correct" or "Incorrect"
-3. If incorrect, provide the actual disease name
-4. Feedback is stored for model improvement
+Response:
+{
+  "items": [...],
+  "total": 100,
+  "page": 1,
+  "limit": 20,
+  "pages": 5
+}
+```
 
-## 🐳 Docker Deployment
+### Submit Feedback
+
+```http
+POST /api/feedback
+Content-Type: application/json
+
+{
+  "id": "prediction-uuid",
+  "correct": false,
+  "true_label": "actual_disease_name"
+}
+
+Response:
+{
+  "id": "uuid",
+  "pred_label": "predicted_disease",
+  "feedback": {
+    "correct": false,
+    "true_label": "actual_disease_name"
+  },
+  ...
+}
+```
+
+## Model Support
+
+### With TorchScript Model
+
+Place your TorchScript model at `models/leafdoc_mobilev3.ts`:
+
+```python
+# Export PyTorch model to TorchScript
+model.eval()
+example = torch.rand(1, 3, 224, 224)
+traced = torch.jit.trace(model, example)
+traced.save("models/leafdoc_mobilev3.ts")
+```
+
+### Without Model (Development)
+
+If no model is found, the API uses stub predictions:
+
+- Returns deterministic fake classifications
+- Confidence fixed at 0.42
+- Skips Grad-CAM generation
+- Perfect for frontend development!
+
+## Database
+
+### Using SQLite (Default)
+
+```env
+DATABASE_URL=sqlite:///./leafdoc.db
+```
+
+### Using PostgreSQL
+
+```env
+DATABASE_URL=postgresql://user:password@localhost:5432/leafdoc
+```
+
+### Migrations
 
 ```bash
-# Start with Docker Compose
-cd backend
+# Create new migration
+alembic revision --autogenerate -m "Description"
+
+# Apply migrations
+alembic upgrade head
+
+# Rollback
+alembic downgrade -1
+```
+
+## Docker Deployment
+
+### Build and run with Docker Compose
+
+```bash
+# Build and start
 docker-compose up -d
 
 # View logs
 docker-compose logs -f
 
-# Stop services
+# Stop
 docker-compose down
 ```
 
-## 🧪 Testing
+### Using PostgreSQL in Docker
 
-### Backend Tests
+Uncomment the `postgres` service in `docker-compose.yml` and update the environment variables.
+
+## Testing
 
 ```bash
-cd backend
+# Run all tests
 pytest
-pytest --cov=app  # With coverage
+
+# Run with coverage
+pytest --cov=app --cov-report=html
+
+# Run specific test file
+pytest tests/test_predict.py
+
+# Run with verbose output
+pytest -v -s
 ```
 
-### Frontend Tests
+## Development
+
+### Code Quality
+
+The project uses:
+
+- **Black**: Code formatting
+- **isort**: Import sorting
+- **Ruff**: Fast linting
+- **mypy**: Type checking
 
 ```bash
-cd leafdoc-plant-aid
-npm test
+# Format code
+black .
+isort .
+
+# Lint
+ruff check .
+
+# Type check
+mypy app/
 ```
 
-## 📁 Project Structure
+### Pre-commit Hooks
 
-```
-.
-├── backend/                    # FastAPI backend
-│   ├── app/
-│   │   ├── main.py            # FastAPI app
-│   │   ├── routers/           # API endpoints
-│   │   ├── services/          # Business logic
-│   │   ├── models.py          # Database models
-│   │   └── schemas.py         # Pydantic schemas
-│   ├── migrations/            # Alembic migrations
-│   ├── tests/                 # Backend tests
-│   ├── storage/               # Uploaded images & heatmaps
-│   ├── models/                # ML model files
-│   └── requirements.txt
-│
-├── leafdoc-plant-aid/         # React frontend
-│   ├── src/
-│   │   ├── pages/             # Route pages
-│   │   ├── components/        # React components
-│   │   ├── lib/               # Utilities & API client
-│   │   └── store/             # State management
-│   ├── public/
-│   └── package.json
-│
-├── start-all.bat              # Startup script (Windows)
-├── test_connection.py         # Integration test script
-└── INTEGRATION_GUIDE.md       # Integration documentation
+```bash
+# Install pre-commit
+pip install pre-commit
+
+# Setup hooks
+pre-commit install
+
+# Run manually
+pre-commit run --all-files
 ```
 
-## 🔧 Configuration
+## Troubleshooting
 
-### Backend (.env)
+### Model not loading
 
-```env
-APP_NAME=LeafDoc
-API_PREFIX=/api
-MODEL_PATH=models/leafdoc_mobilev3.ts
-STORAGE_DIR=storage
-DATABASE_URL=sqlite:///./leafdoc.db
-CORS_ORIGINS=http://localhost:5173,http://localhost:3000
-LOG_LEVEL=INFO
-```
+- Check `MODEL_PATH` in `.env`
+- Verify model file exists and is valid TorchScript
+- Check logs for detailed error messages
+- API will work with stub predictions if model is missing
 
-### Frontend (.env)
+### Database errors
 
-```env
-VITE_API_BASE_URL=http://localhost:8000
-```
+- Run migrations: `alembic upgrade head`
+- Check `DATABASE_URL` configuration
+- For PostgreSQL, ensure database exists
 
-## 🤖 Model Support
-
-### Development (No Model)
-
-The backend works without a trained model:
-
-- Uses stub predictions (deterministic fake results)
-- Returns confidence of 0.42
-- Perfect for frontend development!
-
-### Production (With Model)
-
-Place your TorchScript model at: `backend/models/leafdoc_mobilev3.ts`
-
-To export a PyTorch model:
-
-```python
-import torch
-
-model.eval()
-example = torch.rand(1, 3, 224, 224)
-traced = torch.jit.trace(model, example)
-traced.save("backend/models/leafdoc_mobilev3.ts")
-```
-
-## 🌱 Supported Diseases
-
-- **Apple**: Scab, Black Rot, Cedar Rust, Healthy
-- **Corn**: Cercospora Leaf Spot, Common Rust, Northern Leaf Blight, Healthy
-- **Grape**: Black Rot, Esca, Leaf Blight, Healthy
-- **Potato**: Early Blight, Late Blight, Healthy
-- **Tomato**: 9 diseases including Early Blight, Late Blight, Leaf Mold, etc.
-
-## 🐛 Troubleshooting
-
-### CORS Errors
-
-- Verify `CORS_ORIGINS` in backend `.env` includes your frontend URL
-- Restart backend after changing .env
-
-### Connection Refused
-
-- Ensure backend is running on port 8000
-- Check firewall settings
-- Verify `VITE_API_BASE_URL` in frontend `.env`
-
-### Images Not Displaying
+### Storage issues
 
 - Ensure `storage/images` and `storage/heatmaps` directories exist
 - Check file permissions
-- Verify static file mounting in backend
+- Verify `STORAGE_DIR` in `.env`
 
-### Database Errors
+### CORS errors
 
-- Run migrations: `alembic upgrade head`
-- Check database file permissions
-- For PostgreSQL, ensure database exists
+- Update `CORS_ORIGINS` in `.env`
+- Use `*` for development or specific origins for production
 
-## 📊 API Endpoints
+## Production Deployment
 
-| Method | Endpoint        | Description            |
-| ------ | --------------- | ---------------------- |
-| GET    | `/health`       | Health check           |
-| POST   | `/api/predict`  | Analyze plant image    |
-| GET    | `/api/history`  | Get prediction history |
-| POST   | `/api/feedback` | Submit feedback        |
-| GET    | `/docs`         | Swagger UI             |
-| GET    | `/redoc`        | ReDoc documentation    |
+### Environment Variables
 
-## 🔒 Security Notes
+Set these for production:
 
-For production deployment:
+```env
+LOG_LEVEL=WARNING
+CORS_ORIGINS=https://yourdomain.com
+DATABASE_URL=postgresql://user:pass@host/db
+```
 
-- Enable HTTPS
-- Add authentication (JWT/OAuth)
-- Restrict CORS origins
-- Use environment secrets management
-- Enable rate limiting
-- Set up monitoring and logging
+### Using Gunicorn
 
-## 🤝 Contributing
+```bash
+pip install gunicorn
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests
-5. Submit a pull request
+gunicorn app.main:app \
+  --workers 4 \
+  --worker-class uvicorn.workers.UvicornWorker \
+  --bind 0.0.0.0:8000
+```
 
-## 📝 License
+### Behind Reverse Proxy
 
-MIT License - See [LICENSE](backend/LICENSE) for details
+Configure nginx or similar:
 
-## 🆘 Support
+```nginx
+location /api {
+    proxy_pass http://localhost:8000;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+}
 
-- **Documentation**: Check the `/docs` folder
-- **API Docs**: http://localhost:8000/docs (when running)
-- **Issues**: Open a GitHub issue
-- **Integration**: See [INTEGRATION_GUIDE.md](INTEGRATION_GUIDE.md)
+location /static {
+    proxy_pass http://localhost:8000;
+}
+```
 
-## 🎉 Acknowledgments
+## License
 
-- Plant disease dataset providers
-- OpenAI for development assistance
-- shadcn/ui for beautiful components
-- FastAPI for the amazing framework
+MIT License - See LICENSE file for details
 
----
+## Support
 
-**Made with 💚 for plant lovers and developers**
+For issues and questions:
+
+- Open an issue on GitHub
+- Check the API documentation at `/docs`
+- Review test files for usage examples
