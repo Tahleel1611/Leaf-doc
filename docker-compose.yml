@@ -1,0 +1,45 @@
+version: "3.8"
+
+services:
+  api:
+    build: .
+    container_name: leafdoc-api
+    ports:
+      - "8000:8000"
+    environment:
+      - APP_NAME=LeafDoc
+      - API_PREFIX=/api
+      - LOG_LEVEL=INFO
+      - MODEL_PATH=models/leafdoc_mobilev3.ts
+      - STORAGE_DIR=storage
+      - DATABASE_URL=sqlite:///./leafdoc.db
+      # For PostgreSQL, uncomment below and use postgres service
+      # - DATABASE_URL=postgresql://leafdoc:leafdoc@postgres:5432/leafdoc
+      - CORS_ORIGINS=*
+    volumes:
+      - ./storage:/app/storage
+      - ./models:/app/models
+      - ./leafdoc.db:/app/leafdoc.db
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Uncomment to use PostgreSQL instead of SQLite
+  # postgres:
+  #   image: postgres:15-alpine
+  #   container_name: leafdoc-postgres
+  #   environment:
+  #     POSTGRES_USER: leafdoc
+  #     POSTGRES_PASSWORD: leafdoc
+  #     POSTGRES_DB: leafdoc
+  #   volumes:
+  #     - postgres_data:/var/lib/postgresql/data
+  #   ports:
+  #     - "5432:5432"
+  #   restart: unless-stopped
+# volumes:
+#   postgres_data:

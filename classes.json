@@ -1,0 +1,29 @@
+{
+  "classes": [
+    "apple_scab",
+    "apple_black_rot",
+    "apple_cedar_rust",
+    "apple_healthy",
+    "corn_cercospora_leaf_spot",
+    "corn_common_rust",
+    "corn_northern_leaf_blight",
+    "corn_healthy",
+    "grape_black_rot",
+    "grape_esca",
+    "grape_leaf_blight",
+    "grape_healthy",
+    "potato_early_blight",
+    "potato_late_blight",
+    "potato_healthy",
+    "tomato_bacterial_spot",
+    "tomato_early_blight",
+    "tomato_late_blight",
+    "tomato_leaf_mold",
+    "tomato_septoria_leaf_spot",
+    "tomato_spider_mites",
+    "tomato_target_spot",
+    "tomato_mosaic_virus",
+    "tomato_yellow_leaf_curl",
+    "tomato_healthy"
+  ]
+}
