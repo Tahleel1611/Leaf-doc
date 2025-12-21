@@ -13,7 +13,7 @@ from fastapi.responses import JSONResponse
 from app.config import settings
 from app.db import init_db
 from app.services import inference, storage
-from app.routers import predict, history, feedback
+from app.routers import predict, history, feedback, statistics
 from app.schemas import HealthResponse
 
 # Configure logging
@@ -162,6 +162,7 @@ def health_check() -> HealthResponse:
 app.include_router(predict.router, prefix=settings.API_PREFIX, tags=["Predictions"])
 app.include_router(history.router, prefix=settings.API_PREFIX, tags=["History"])
 app.include_router(feedback.router, prefix=settings.API_PREFIX, tags=["Feedback"])
+app.include_router(statistics.router, prefix=settings.API_PREFIX, tags=["Statistics"])
 
 # Mount static files
 try:
