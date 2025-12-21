@@ -64,3 +64,34 @@ class HealthResponse(BaseModel):
     status: str
     app_name: str
     model_loaded: bool
+
+
+# Statistics Schemas
+class DiseaseStats(BaseModel):
+    """Disease distribution statistics."""
+    
+    disease_name: str
+    count: int
+    avg_confidence: float = Field(..., ge=0.0, le=1.0)
+
+
+class TimeSeriesData(BaseModel):
+    """Time series data point."""
+    
+    date: str
+    count: int
+
+
+class StatisticsResponse(BaseModel):
+    """Comprehensive statistics response."""
+    
+    total_predictions: int
+    predictions_with_feedback: int
+    correct_predictions: int
+    accuracy_rate: Optional[float] = None
+    avg_confidence: float
+    disease_distribution: list[DiseaseStats]
+    daily_predictions: list[TimeSeriesData]
+    date_range_days: int
+    start_date: datetime
+    end_date: datetime
